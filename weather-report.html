@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            font-family: 'Poppins', sans-serif;
+        }
+        body{
+            background-color: black;
+        }
+        .card{
+            width: 90%;
+            max-width: 490px;
+            background: rgb(11,164,156);
+            background: linear-gradient(120deg, rgb(2, 183, 189) 10%, rgb(5, 170, 154) 40%,rgb(1, 143, 96) 85%);
+            border-radius: 20px;
+            border: solid 0.5px white;
+            text-align: center;
+            margin: 150px auto 0px;
+            padding: 40px 35px;
+            color: white;
+        }
+        .row1{
+            display: flex;
+            flex-direction: column;
+        }
+        .select-state{
+            border: none;
+            outline: none;
+            border-radius: 20px;
+            height: 50px;
+            padding: 10px 25px;
+            margin: 10px 0;
+        }
+        
+        .select-city{
+            border: none;
+            outline: none;
+            border-radius: 20px;
+            height: 50px;
+            padding: 10px 25px;
+        }
+
+        .select-country{
+            border: none;
+            outline: none;
+            border-radius: 20px;
+            height: 50px;
+            padding: 10px 25px;
+        }
+
+        .btn{
+            border: none;
+            outline: none;
+            border-radius: 20px;
+            height: 40px;
+            width: 100px;
+            margin: 10px 0px;
+        }
+
+        .row2{
+            margin: 0px 8px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .msg{
+            font-size: 15px;
+            visibility: hidden;
+        }
+
+        .city-name{
+            font-size: 20px;
+            font-weight: 400;
+        }
+
+        .row3{
+            align-content: center;
+            display: flex;
+            flex-direction: row;
+            margin: 0px 100px;
+            visibility: hidden;
+            justify-content: space-between;
+        }
+
+        .row3 .card{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            width: 300px;
+            margin: 10px 5px;
+            padding: 0px 20px;
+        }
+
+        .minmax{
+            padding: 20px 0px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1> Weather Report </h1>
+        <div class="row1">
+            <select class="select-country">
+                <option class="option">Select the Country</option>
+            </select>
+            <select class="select-state">
+                <option class="option">Select the State</option>
+            </select>
+            <select class="select-city">
+                <option class="option">Select the City</option>
+            </select>
+        </div>
+        <div class="row2">
+            <div class="msg">Please select valid options</div>
+            <button class="btn" onclick="getweather(),getyesweather(),gettomwether()">Get Data</button>
+        </div>
+        
+    </div>
+    <div class="row3">
+        <div class="card">
+            <div class="yplace">
+
+            </div>
+            <h1 class="yes-temp">
+
+            </h1>
+        </div>
+        <div class="card">
+            <div class="city-name">
+                
+            </div>
+            <h1 class="today-temp">
+                
+            </h1>
+            <div class="disc">
+                
+            </div>
+            <div class="minmax">
+
+            </div>
+        </div>
+        <div class="card">
+            <div class="tplace"></div>
+            <h1 class="tom-temp"></h1>
+        </div>
+    </div>
+    <script>
+            const selectState = document.querySelector(".select-state");
+            const selectCity = document.querySelector(".select-city");
+            const selectCountry = document.querySelector(".select-country");
+            var isoCode;
+            var state;
+            
+            selectState.addEventListener("change", function () {
+                state = selectState.value.split(" - ")[1];
+                getcity();
+            });
+            
+            selectCountry.addEventListener("change", function () {
+                isoCode = selectCountry.value.split(" - ")[1];
+                getstate();
+            });
+            
+            
+            var headers = new Headers();
+            headers.append("X-CSCAPI-KEY", "NGRyRWtFNHl0c0hoSW9neVlPVnBwRTRpV0pBOERHYWJJVWdnSzVENA==");
+            
+            var requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+            };
+            async function getcountry(){
+                const response = await fetch("https://api.countrystatecity.in/v1/countries", requestOptions);
+                const data = await response.json();
+                const op = document.getElementsByClassName("select-country")
+                data.forEach(element => {
+                    var n = element.name + " - " + element.iso2
+                    var opt = document.createElement("option")
+                    opt.innerHTML = n
+                    op[0].appendChild(opt)
+                })
+            }
+            
+            async function getstate(){
+                const response = await fetch("https://api.countrystatecity.in/v1/countries/"+isoCode+"/states", requestOptions);
+                const data = await response.json();
+                const stateSelect = document.querySelector(".select-state");
+                stateSelect.innerHTML = "<option class='option'>Select the State</option>";
+                data.forEach(element => {
+                    stateSelect.innerHTML += `<option class="option">${element.name + " - " + element.iso2}</option>`;
+                });
+            }
+            
+            async function getcity() {
+                const response = await fetch("https://api.countrystatecity.in/v1/countries/"+isoCode+"/states/"+state+"/cities", requestOptions);
+                const data = await response.json();
+                selectCity.innerHTML = "<option class='option'>Select the City</option>";
+
+                data.forEach(element => {
+                    document.querySelector(".select-city").innerHTML += `<option class="option">${element.name}</option>`;
+                });
+            }
+            async function getweather() {
+                const city = document.querySelector(".select-city").value;
+                const today_temp_url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/" + city + "?unitGroup=metric&key=CTFY737TRBGC2BQJJ9K84569E&contentType=json";
+                const response = await fetch(today_temp_url);
+                //console.log(response.status);
+                if (response.status == 400) {
+                    document.querySelector(".msg").style.visibility = "visible";
+                } else {
+                    const data = await response.json();
+                    const row3 = document.querySelector(".row3");
+                    if (row3) row3.style.visibility = "visible";
+                    document.querySelector(".today-temp").innerHTML = data.days[0].temp + "°C";
+                    document.querySelector(".city-name").innerHTML = data.resolvedAddress;
+                    document.querySelector(".msg").style.visibility = "hidden";
+                    document.querySelector(".disc").innerHTML = data.days[0].conditions
+                    document.querySelector(".minmax").innerHTML = data.days[0].tempmin + "°C" + " / " + data.days[0].tempmax + "°C"
+                }
+            }
+
+
+            async function gettomwether(){
+                const city = document.querySelector(".select-city").value;
+                const tommorow_temp_url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/"+city+"/tomorrow?unitGroup=metric&key=CTFY737TRBGC2BQJJ9K84569E&contentType=json&include=days(1)";
+                const response = await fetch(tommorow_temp_url);
+                //console.log(response.status);
+                const data = await response.json();
+                document.querySelector(".tplace").innerHTML = "Tomorrow temperature in "+data.address+" will be ";
+                document.querySelector(".tom-temp").innerHTML = data.days[0].temp + "°C";
+            }
+
+            async function getyesweather(){
+                const city = document.querySelector(".select-city").value;
+                const yes_temp_url = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/"+city+"/yesterday?unitGroup=metric&key=CTFY737TRBGC2BQJJ9K84569E&contentType=json&include=days(1)";
+                const response = await fetch(yes_temp_url);
+                const data = await response.json();
+                document.querySelector(".yplace").innerHTML = "Yesterday temperature in "+data.address+" was ";
+                document.querySelector(".yes-temp").innerHTML = data.days[0].temp + "°C";
+            }
+
+            getcountry();
+    </script>
+</body>
+</html>
